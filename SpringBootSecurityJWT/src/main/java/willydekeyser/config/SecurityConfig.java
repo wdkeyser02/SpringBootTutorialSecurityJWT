@@ -4,6 +4,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
@@ -39,18 +41,28 @@ public class SecurityConfig {
 				.build());
 	}
 	
+	@Order(Ordered.HIGHEST_PRECEDENCE)
+	@Bean
+	SecurityFilterChain tokenSecurityFilterChain(HttpSecurity http) throws Exception {
+		return http
+				.securityMatcher("/token")
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/token").permitAll())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.csrf(csrf -> csrf.disable())
+				.httpBasic(withDefaults())
+				.build();
+	}
+	
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(
 						auth -> auth
-						.requestMatchers("/token").permitAll()
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
 				.sessionManagement(session -> session
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.httpBasic(withDefaults())
 				.build();
 	}
 	
