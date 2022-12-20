@@ -27,11 +27,11 @@ public class TokenService {
 				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toSet());
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("User")
+                .issuer(authentication.getName())
                 .issuedAt(now)
                 .expiresAt(now.plus(1, ChronoUnit.HOURS))
                 .subject(authentication.getName())
-                .claim("authorities", authorities)
+                .claim("roles", authorities)
                 .build();
         return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
