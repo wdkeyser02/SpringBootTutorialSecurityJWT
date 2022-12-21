@@ -1,4 +1,4 @@
-package willydekeyser.config;
+package willydekeyser.config.converter;
 
 import java.util.ArrayList;
 import java.util.Collection;

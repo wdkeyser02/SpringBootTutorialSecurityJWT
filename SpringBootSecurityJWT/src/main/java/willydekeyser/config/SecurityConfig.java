@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -71,9 +72,6 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		
-		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter(); 
-		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new MyRoleConverter());
-		
 		return http
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(
@@ -82,8 +80,7 @@ public class SecurityConfig {
 						.requestMatchers("/admin").hasAuthority("ROLE_ADMIN")
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2 -> oauth2
-						.jwt()
-						.jwtAuthenticationConverter(jwtAuthenticationConverter))
+						.jwt())
 				.sessionManagement(session -> session
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.build();
@@ -106,4 +103,14 @@ public class SecurityConfig {
          return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
     }
     
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        final JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        final JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
+    }
 }
