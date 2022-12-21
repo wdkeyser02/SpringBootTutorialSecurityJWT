@@ -30,7 +30,7 @@ public class MyUser extends User {
 	private String lastName;
 	private String fullname;
 	private String emailaddress;
-	private LocalDate birthdate;;
+	private LocalDate birthdate;
 
 	
 	@Override
