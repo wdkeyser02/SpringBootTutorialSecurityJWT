@@ -7,6 +7,9 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import willydekeyser.config.MyJwtUser;
+import willydekeyser.config.MyUser;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
@@ -21,19 +24,24 @@ public class TokenService {
         this.encoder = encoder;
     }
 
-    public String generateToken(Authentication authentication) {
-        Instant now = Instant.now();
-        Set<String> authorities = authentication.getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
+	public String generateToken(Authentication authentication) {
+		Set<String> authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toSet());
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer(authentication.getName())
-                .issuedAt(now)
-                .expiresAt(now.plus(1, ChronoUnit.HOURS))
-                .subject(authentication.getName())
-                .claim("roles", authorities)
-                .build();
-        return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-    }
+		MyUser myUser = (MyUser) authentication.getPrincipal();
+		MyJwtUser myJwtUser = new MyJwtUser(authentication.getName(), myUser.getFirstName(), myUser.getLastName(),
+				myUser.getFullname(), myUser.getEmailaddress(), myUser.getBirthdate().toString(), myUser.getPassword(),
+				myUser.isEnabled(), myUser.isAccountNonExpired(), myUser.isCredentialsNonExpired(),
+				myUser.isAccountNonLocked(), authorities);
+		Instant now = Instant.now();
+		JwtClaimsSet claims = JwtClaimsSet.builder()
+				.issuer(authentication.getName())
+				.issuedAt(now)
+				.expiresAt(now.plus(1, ChronoUnit.HOURS))
+				.subject(authentication.getName())
+				.claim("roles", authorities)
+				.claim("myuser", myJwtUser)
+				.build();
+		return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+	}
 
 }
