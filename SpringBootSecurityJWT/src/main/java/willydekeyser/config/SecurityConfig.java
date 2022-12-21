@@ -2,10 +2,13 @@ package willydekeyser.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,20 +40,10 @@ public class SecurityConfig {
 	private RSAKey rsaKey;
 
 	@Bean
-	public UserDetailsService users() {
-		UserDetails user = User.builder()
-				.username("user")
-				.password(passwordEncoder().encode("password"))
-				.roles("USER")
-				.build();
-		UserDetails admin = User.builder()
-				.username("admin")
-				.password(passwordEncoder().encode("password"))
-				.roles("USER", "ADMIN")
-				.build();
-		return new InMemoryUserDetailsManager(user, admin);
+	UserDetailsService myUserDetailsService() {
+		return new MyUserDetailsService();
 	}
-
+	
 	@Bean
 	BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -113,4 +106,18 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
+    
+	@Bean
+	ApplicationListener<AuthenticationSuccessEvent> successEvent() {
+		return event -> {
+			System.out.println("Success Login " + event.getAuthentication().getClass().getSimpleName() + " - " + event.getAuthentication().getName());
+		};
+	}
+	
+	@Bean
+	ApplicationListener<AuthenticationFailureBadCredentialsEvent> failureEvent() {
+		return event -> {
+			System.err.println("Bad Credentials Login " + event.getAuthentication().getClass().getSimpleName() + " - " + event.getAuthentication().getName());
+		};
+	}
 }
