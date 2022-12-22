@@ -13,11 +13,11 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 import willydekeyser.config.MyUser;
 
-public class MyCustomAuthenticationConverter implements Converter<Jwt, MyCustomAuthenticationtoken> {
+public class MyCustomAuthenticationConverter implements Converter<Jwt, MyCustomAuthenticationToken> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public MyCustomAuthenticationtoken convert(Jwt source) {
+	public MyCustomAuthenticationToken convert(Jwt source) {
 		Map<String, String> user = (Map<String, String>) source.getClaims().get("myuser");
 		Object authoritiesClaim = user.get("authorities");
 		Set<GrantedAuthority> authorities = ((Collection<String>) authoritiesClaim).stream()
@@ -26,7 +26,7 @@ public class MyCustomAuthenticationConverter implements Converter<Jwt, MyCustomA
 		MyUser myUser = new MyUser(user.get("username"), "", true, true, true, true, 
 				authorities, user.get("firstName"), user.get("lastName"), user.get("emailaddress"), 
 				LocalDate.parse(user.get("birthdate")));	
-		return new MyCustomAuthenticationtoken(authorities, myUser);
+		return new MyCustomAuthenticationToken(authorities, myUser);
 	}
 
 }

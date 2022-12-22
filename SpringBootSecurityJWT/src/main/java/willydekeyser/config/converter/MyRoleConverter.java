@@ -19,7 +19,7 @@ public class MyRoleConverter implements Converter<Jwt, Collection<GrantedAuthori
 		if (rolesClaims == null || rolesClaims.isEmpty()) {
 			return new ArrayList<>();
 		}
-		Collection<String> authorities = (Collection<String>) rolesClaims.get("roles");
+		Collection<String> authorities = (Collection<String>) rolesClaims.get("authorities");
 		return authorities.stream()
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toSet());

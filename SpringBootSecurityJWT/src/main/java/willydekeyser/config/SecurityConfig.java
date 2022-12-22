@@ -63,9 +63,6 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		
-		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new MyRoleConverter());
-		
 		return http
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(
@@ -75,8 +72,8 @@ public class SecurityConfig {
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2 -> oauth2
 						.jwt()
-						.jwtAuthenticationConverter(jwtAuthenticationConverter))
-						//.jwtAuthenticationConverter(new MyCustomAuthenticationConverter()))
+						//.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+						.jwtAuthenticationConverter(new MyCustomAuthenticationConverter()))
 				.sessionManagement(session -> session
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.build();
@@ -97,6 +94,13 @@ public class SecurityConfig {
     @Bean
     JwtDecoder jwtDecoder() throws JOSEException {
          return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+    }
+    
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        final JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new MyRoleConverter());
+        return jwtAuthenticationConverter;
     }
     
 	@Bean
