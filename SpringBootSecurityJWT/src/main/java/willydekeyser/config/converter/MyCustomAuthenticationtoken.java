@@ -10,7 +10,7 @@ import willydekeyser.config.MyUser;
 public class MyCustomAuthenticationtoken extends AbstractAuthenticationToken {
 
 	private static final long serialVersionUID = 1L;
-	MyUser myUser;
+	private final MyUser myUser;
 
 	public MyCustomAuthenticationtoken(Collection<? extends GrantedAuthority> authorities, MyUser myUser) {
 		super(authorities);
@@ -19,9 +19,8 @@ public class MyCustomAuthenticationtoken extends AbstractAuthenticationToken {
 
 	@Override
 	public boolean isAuthenticated() {
-		return true;
+		return !myUser.getAuthorities().isEmpty();
 	}
-
 	
 	@Override
 	public Object getCredentials() {
@@ -36,6 +35,21 @@ public class MyCustomAuthenticationtoken extends AbstractAuthenticationToken {
 	@Override
 	public Object getPrincipal() {
 		return myUser;
+	}
+
+	@Override
+	public Collection<GrantedAuthority> getAuthorities() {
+		return super.getAuthorities();
+	}
+
+	@Override
+	public void setAuthenticated(boolean authenticated) {
+		throw new IllegalArgumentException("Don't do this");
+	}
+
+	@Override
+	public Object getDetails() {
+		return myUser.getUsername();
 	}
 
 }
