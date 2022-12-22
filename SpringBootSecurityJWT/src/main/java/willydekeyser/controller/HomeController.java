@@ -19,6 +19,7 @@ public class HomeController {
 	
 	@GetMapping("/admin")
 	public String admin(Authentication authentication) {
+		System.err.println("Authentication: " + authentication);
 		return "Welkom on the Admin page! - Username: " + authentication.getName() + " - " + authentication.getAuthorities();
 	}
 }

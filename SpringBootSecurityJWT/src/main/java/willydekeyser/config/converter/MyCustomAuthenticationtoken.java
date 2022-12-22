@@ -39,7 +39,7 @@ public class MyCustomAuthenticationtoken extends AbstractAuthenticationToken {
 
 	@Override
 	public Collection<GrantedAuthority> getAuthorities() {
-		return super.getAuthorities();
+		return myUser.getAuthorities();
 	}
 
 	@Override

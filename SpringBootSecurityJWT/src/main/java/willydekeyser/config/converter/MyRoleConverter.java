@@ -15,12 +15,12 @@ public class MyRoleConverter implements Converter<Jwt, Collection<GrantedAuthori
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<GrantedAuthority> convert(Jwt source) {
-		Map<String, Object> roles = source.getClaims();		
-		if (roles == null || roles.isEmpty()) {
+		Map<String, Object> rolesClaims = source.getClaims();		
+		if (rolesClaims == null || rolesClaims.isEmpty()) {
 			return new ArrayList<>();
 		}
-		Collection<String> resourceRoles = (Collection<String>) roles.get("roles");
-		return resourceRoles.stream()
+		Collection<String> authorities = (Collection<String>) rolesClaims.get("roles");
+		return authorities.stream()
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toSet());
 	}

@@ -25,20 +25,22 @@ public class TokenService {
     }
 
 	public String generateToken(Authentication authentication) {
-		Set<String> authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+		Set<String> authorities = authentication.getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toSet());
-		MyUser myUser = (MyUser) authentication.getPrincipal();
-		MyJwtUser myJwtUser = new MyJwtUser(authentication.getName(), myUser.getFirstName(), myUser.getLastName(),
-				myUser.getFullname(), myUser.getEmailaddress(), myUser.getBirthdate().toString(), myUser.getPassword(),
-				myUser.isEnabled(), myUser.isAccountNonExpired(), myUser.isCredentialsNonExpired(),
-				myUser.isAccountNonLocked(), authorities);
+		//MyUser myUser = (MyUser) authentication.getPrincipal();
+		//MyJwtUser myJwtUser = new MyJwtUser(authentication.getName(), myUser.getFirstName(), myUser.getLastName(),
+		//		myUser.getFullname(), myUser.getEmailaddress(), myUser.getBirthdate().toString(), myUser.getPassword(),
+		//		myUser.isEnabled(), myUser.isAccountNonExpired(), myUser.isCredentialsNonExpired(),
+		//		myUser.isAccountNonLocked(), authorities);
 		Instant now = Instant.now();
 		JwtClaimsSet claims = JwtClaimsSet.builder()
 				.issuer(authentication.getName())
 				.issuedAt(now)
 				.expiresAt(now.plus(1, ChronoUnit.HOURS))
 				.subject(authentication.getName())
-				.claim("myuser", myJwtUser)
+				.claim("roles", authorities)
+				//.claim("myuser", myJwtUser)
 				.build();
 		return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 	}
