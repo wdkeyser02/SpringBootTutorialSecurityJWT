@@ -38,7 +38,6 @@ public class TokenService {
 				.issuedAt(now)
 				.expiresAt(now.plus(1, ChronoUnit.HOURS))
 				.subject(authentication.getName())
-				.claim("roles", authorities)
 				.claim("myuser", myJwtUser)
 				.build();
 		return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
