@@ -25,7 +25,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.JOSEException;
@@ -35,7 +34,6 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
 import willydekeyser.config.converter.MyCustomAuthenticationConverter;
-import willydekeyser.config.converter.MyRoleConverter;
 import willydekeyser.jose.Jwks;
 
 @Configuration
@@ -80,7 +78,6 @@ public class SecurityConfig {
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2 -> oauth2
 						.jwt()
-						//.jwtAuthenticationConverter(jwtAuthenticationConverter()))
 						.jwtAuthenticationConverter(new MyCustomAuthenticationConverter()))
 				.sessionManagement(session -> session
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -117,13 +114,6 @@ public class SecurityConfig {
     @Bean
     JwtDecoder jwtDecoder() throws JOSEException {
          return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
-    }
-    
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        final JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new MyRoleConverter());
-        return jwtAuthenticationConverter;
     }
     
 	@Bean
